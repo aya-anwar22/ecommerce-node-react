@@ -1,5 +1,10 @@
 const wkx = require("wkx");
-console.log("wkx loaded successfully");
+try {
+  require.resolve("wkx");
+  console.log("✅ wkx موجود ويمكن تحميله");
+} catch (e) {
+  console.error("❌ wkx غير موجود، هناك مشكلة في التثبيت");
+}
 
 const { Sequelize } = require("sequelize");
 
