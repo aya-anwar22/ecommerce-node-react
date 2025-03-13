@@ -6,7 +6,8 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: "mysql",
+    dialect: "sqlite",
+    storage: "database.sqlite" ,
     port:  15736,
     dialectOptions: {
       ssl: {
