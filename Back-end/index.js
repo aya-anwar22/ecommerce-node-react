@@ -6,6 +6,7 @@ dotenv.config({ path: 'config.env' });
 const sequelize = require('./config/database'); // Database connection setup
 const ApiError = require('./utils/appError');
 const globalError = require('./middleware/errorMiddleWare');
+const authRoutes = require('./routes/userRoutes');
 
 
 const app = express();
@@ -19,7 +20,7 @@ app.use(express.json()); // For JSON bodies
 app.use(express.urlencoded({ extended: true })); // For URL encoded bodies
 
 // Routes
-
+app.use('/api/v1/users', authRoutes);
 // Error Handling Middleware
 app.use(globalError); // Catch all errors
 

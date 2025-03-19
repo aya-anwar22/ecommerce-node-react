@@ -21,6 +21,8 @@ const User = sequelize.define("User", {
 // userId
 const UserVerification = sequelize.define("UserVerification", {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Users', key: 'id' }, onDelete: "CASCADE" },
+
     emailVerificationCode: { type: DataTypes.STRING(6) },
     verificationCodeExpiry: { type: DataTypes.DATE },
     isVerified: { type: DataTypes.BOOLEAN, defaultValue: false },
