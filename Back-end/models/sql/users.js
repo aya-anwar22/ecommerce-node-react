@@ -1,7 +1,4 @@
-// Users
-// UserVerification
-// Roles
-// UserRoles
+// Users  UserVerification Roles  UserRoles
 const { DataTypes } = require("sequelize")
 const sequelize = require("../../config/database");
 

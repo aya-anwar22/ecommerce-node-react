@@ -7,8 +7,8 @@ const sequelize = require('./config/database'); // Database connection setup
 const ApiError = require('./utils/appError');
 const globalError = require('./middleware/errorMiddleWare');
 const authRoutes = require('./routes/userRoutes');
-
-
+const categoryRoutes = require('./routes/categoryRoutes');
+const subCategoryRouters = require('./routes/subCategoryRouters');
 const app = express();
 
 // Middleware Setup
@@ -21,6 +21,8 @@ app.use(express.urlencoded({ extended: true })); // For URL encoded bodies
 
 // Routes
 app.use('/api/v1/users', authRoutes);
+app.use('/api/v1/category', categoryRoutes);
+app.use('/api/v1/subcatergory', subCategoryRouters)
 // Error Handling Middleware
 app.use(globalError); // Catch all errors
 
