@@ -117,6 +117,7 @@ exports.deleteCategoryById = asyncHandler(async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ message: "Unauthorized. Please log in first." });
     }
+
     const userId = req.user.id;
     const userRoles = await UserRole.findAll({
         where: { userId },
@@ -138,7 +139,11 @@ exports.deleteCategoryById = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "Category not found" });
     }
 
+    await SubCategory.destroy({
+        where: { categoryId: categoryId }
+    });
+
     await category.destroy();
 
-    res.status(200).json({ message: "Category deleted successfully" });
+    res.status(200).json({ message: "Category and its related subcategories deleted successfully" });
 });

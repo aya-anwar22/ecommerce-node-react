@@ -2,3 +2,4 @@
 // ProductSubCategory
 // ProductColors
 // ProductImages
+// ProductCategory
