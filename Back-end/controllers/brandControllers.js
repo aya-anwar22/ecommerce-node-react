@@ -20,7 +20,7 @@ exports.createBrand = asyncHandler(async (req, res) => {
         console.log(isAdmin)
     
         if (!isAdmin) {
-            return res.status(403).json({ message: "You are not authorized to create Category. Only admins are allowed." });
+            return res.status(403).json({ message: "You are not authorized to create Brand. Only admins are allowed." });
         }
 
     const { brandName, brandImage } = req.body;

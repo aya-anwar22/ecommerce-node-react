@@ -4,7 +4,7 @@ const sequelize = require("../../config/database");
 
 const { User, UserVerification, Role, UserRole } =  require('./users');
 const  { Category, SubCategory, Brand} = require('./categories_brands');
-
+const {Product, ProductCategory, ProductImages, ProductColors, ProductSubCategory} = require('./products')
 
 // User => UserVerification    -One TO One-
 User.hasOne(UserVerification, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -21,9 +21,32 @@ UserRole.belongsTo(User, { foreignKey: "userId" });
 Category.hasMany(SubCategory, { foreignKey: "categoryId", onDelete: "CASCADE" });
 SubCategory.belongsTo(Category, { foreignKey: "categoryId" });
 
+
+
+// Product => Brand (Many to One)
+Product.belongsTo(Brand, { foreignKey: 'brandId' });
+Brand.hasMany(Product, { foreignKey: 'brandId' });
+
+// Product => Category (Many to Many via ProductCategory)
+Product.belongsToMany(Category, { through: ProductCategory, foreignKey: 'productId', onDelete: "CASCADE" });
+Category.belongsToMany(Product, { through: ProductCategory, foreignKey: 'categoryId', onDelete: "CASCADE" });
+
+// Product => SubCategory (Many to Many via ProductSubCategory)
+Product.belongsToMany(SubCategory, { through: ProductSubCategory, foreignKey: 'productId', onDelete: "CASCADE" });
+SubCategory.belongsToMany(Product, { through: ProductSubCategory, foreignKey: 'subCategoryId', onDelete: "CASCADE" });
+
+// Product => ProductColors (One to Many)
+Product.hasMany(ProductColors, { foreignKey: 'productId' });
+ProductColors.belongsTo(Product, { foreignKey: 'productId' });
+
+// Product => ProductImages (One to Many)
+Product.hasMany(ProductImages, { foreignKey: 'productId' });
+ProductImages.belongsTo(Product, { foreignKey: 'productId' });
+
 module.exports = {
     sequelize,
     User, UserVerification, Role, UserRole,
-    Category, SubCategory, Brand
+    Category, SubCategory, Brand,
+    Product, ProductCategory, ProductImages, ProductColors, ProductSubCategory
    
 };

@@ -6,11 +6,12 @@ dotenv.config({ path: 'config.env' });
 const sequelize = require('./config/database'); // Database connection setup
 const ApiError = require('./utils/appError');
 const globalError = require('./middleware/errorMiddleWare');
-const authRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subCategoryRouters = require('./routes/subCategoryRouters');
 const brandRouters = require('./routes/brandRouters');
-// const productRouters = require('./routes/productRouters')
+const productRouters = require('./routes/productRouters');
+const userRoutes = require('./routes/userRoutes')
 const app = express();
 
 // Middleware Setup
@@ -26,7 +27,10 @@ app.use('/api/v1/users', authRoutes);
 app.use('/api/v1/category', categoryRoutes);
 app.use('/api/v1/subcatergory', subCategoryRouters)
 app.use('/api/v1/brand', brandRouters);
-// app.use('/api/v1/product', productRouters)
+app.use('/api/v1/product', productRouters)
+app.use('/api/v1/users', userRoutes)
+
+
 
 
 

@@ -163,6 +163,54 @@ exports.verifyEmail = asyncHandler(async (req, res) => {
     return res.status(200).json({ message: "Email verified successfully" });
 });
 
+// exports.login = asyncHandler(async (req, res) => {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//         return res.status(400).json({ message: "Please provide email and password" });
+//     }
+
+//     const user = await User.findOne({
+//         where: { email },
+//         include: [
+//             {
+//                 model: UserVerification
+//             },
+//             {
+//                 model: Role,  // استدعاء Role مباشرة لأن العلاقة Many-to-Many
+//                 through: { attributes: [] }, // إخفاء الجدول الوسيط UserRole من النتيجة
+//                 attributes: ['role']
+//             }
+//         ]
+//     });
+//     console.log(user.Roles);  // تحقق مما يتم جلبه فعليًا
+
+    
+//     if (!user) {
+//         return res.status(401).json({ message: "Invalid email or password" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//         return res.status(401).json({ message: "Invalid Password" });
+//     }
+
+//     if (!user.UserVerification.isVerified) {
+//         return res.status(401).json({ message: "Please verify your email first" });
+//     }
+
+//     const { accessToken, refreshToken, refreshTokenExpiry } = await generateTokens(user, true);
+//     const roles = user.Roles ? user.Roles.map(role => role.role) : [];
+// return res.status(200).json({
+//     message: "Login successful",
+//     accessToken,
+//     refreshToken,
+//     refreshTokenExpiry,
+//     roles,  // الآن يجب أن تحتوي على ["admin"]
+// });
+
+// });
+
 exports.login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -170,21 +218,36 @@ exports.login = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Please provide email and password" });
     }
 
-    const user = await User.findOne({ where: { email }, include: UserVerification });
+    const user = await User.findOne({
+        where: { email },
+        include: [
+            {
+                model: UserVerification
+            },
+            {
+                model: Role, 
+                through: { attributes: [] },
+                attributes: ['role']
+            }
+        ]
+    });
+    console.log(user.Roles);  
 
     if (!user) {
         return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        return res.status(401).json({ message: "Invalid Password" });
-    }
 
+        
+    const isMatch = await bcrypt.compare(password, user.password);
+    // if (!isMatch) {
+    //     return res.status(401).json({ message: "Invalid Password" });
+    // }
+    console.log(`isMatch: ${isMatch}`)
     if (!user.UserVerification.isVerified) {
         return res.status(401).json({ message: "Please verify your email first" });
     }
-
+    const roles = user.Roles ? user.Roles.map(role => role.role) : [];
     const { accessToken, refreshToken, refreshTokenExpiry } = await generateTokens(user, true);
 
     return res.status(200).json({
@@ -192,9 +255,9 @@ exports.login = asyncHandler(async (req, res) => {
         accessToken,
         refreshToken,
         refreshTokenExpiry,
+        roles
     });
 });
-
 
 
 

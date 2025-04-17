@@ -1,15 +1,14 @@
 const express = require('express');
-const authController = require('../controllers/authControllers');
+const userControllers  = require('../controllers/userControllers');
 const authenticate = require('../middleware/authenticate');
+const upload = require('../config/multerConfig'); 
 const router = express.Router();
 
-router.post('/register', authController.register);
-router.post('/verify-email', authController.verifyEmail);
-
-router.post('/login', authController.login);
-router.post('/forget-password', authController.forgetPassword);
-router.post('/reset-password', authController.resetPassword);
-router.post('/refresh-token', authController.refreshToken);
-router.post('/logout', authController.logout);
+router.post('/', authenticate, userControllers.addUser);
+router.get('/me', authenticate, userControllers.getUserByToken)
+router.get('/:userId', authenticate, userControllers.getUserByAdmin)
+router.get('/', authenticate, userControllers.getAllUser)
+router.put('/:userId?', authenticate, upload.single('file'), userControllers.updateUser)
+router.delete('/:userId?', authenticate, userControllers.deleteUser)
 
 module.exports = router;
