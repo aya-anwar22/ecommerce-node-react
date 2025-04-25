@@ -1,12 +1,11 @@
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
-const { Role, UserRole, Category, SubCategory} = require("../models/sql");
+const { Role, UserRole, Category, SubCategory } = require("../models/sql");
 const { Op } = require("sequelize");
+const cloudinary = require('../config/cloudinary');
 
 exports.createSubCategory = asyncHandler(async (req, res) => {
-
     const userId = req.user.id;
-    console.log(userId)
     const userRoles = await UserRole.findAll({
         where: { userId },
         include: {
@@ -18,26 +17,39 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
     const isAdmin = userRoles.length > 0;
 
     if (!isAdmin) {
-        return res.status(403).json({ message: "You are not authorized to create Category. Only admins are allowed." });
+        return res.status(403).json({ message: "You are not authorized to create SubCategory. Only admins are allowed." });
     }
 
-    const { categoryId, subCategoryName, subCategoryImage } = req.body;
+    const { categoryId, subCategoryName } = req.body;
+
+    if (!categoryId || !subCategoryName || !req.file) {
+        return res.status(400).json({ message: "Please provide category ID, subcategory name, and image" });
+    }
 
     const category = await Category.findByPk(categoryId);
     if (!category) {
         return res.status(404).json({ message: "Category not found" });
     }
 
-    const subCategory = await SubCategory.create({
-        categoryId,
-        subCategoryName,
-        subCategorySlug: slugify(subCategoryName, { lower: true }),
-        subCategoryImage
-    });
+    try {
+        // Upload image to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'subcategories'
+        });
 
-    res.status(201).json({ message: "SubCategory created successfully", subCategory });
+        const subCategory = await SubCategory.create({
+            categoryId,
+            subCategoryName,
+            subCategorySlug: slugify(subCategoryName, { lower: true }),
+            subCategoryImage: result.secure_url
+        });
+
+        res.status(201).json({ message: "SubCategory created successfully", subCategory });
+    } catch (error) {
+        console.error('Error creating subcategory:', error);
+        return res.status(500).json({ message: "Error creating subcategory" });
+    }
 });
-
 
 exports.getAllSubCategories = asyncHandler(async (req, res) => {
     let { page, limit, search, categoryId } = req.query;
@@ -60,7 +72,7 @@ exports.getAllSubCategories = asyncHandler(async (req, res) => {
         limit,
         offset,
         order: [["createdAt", "DESC"]],
-        raw: true, 
+        raw: true,
         nest: false
     });
 
@@ -70,8 +82,8 @@ exports.getAllSubCategories = asyncHandler(async (req, res) => {
         subCategorySlug: row.subCategorySlug,
         subCategoryImage: row.subCategoryImage,
         categoryId: row.categoryId,
-        categoryName: row["Category.categoryName"],  
-        categorySlug: row["Category.categorySlug"], 
+        categoryName: row["Category.categoryName"],
+        categorySlug: row["Category.categorySlug"],
         createdAt: row.createdAt,
         updatedAt: row.updatedAt
     }));
@@ -84,15 +96,13 @@ exports.getAllSubCategories = asyncHandler(async (req, res) => {
     });
 });
 
-
-
 exports.getSubCategoryById = asyncHandler(async (req, res) => {
-    const { subCategoryId } = req.params;  
+    const { subCategoryId } = req.params;
     const subCategory = await SubCategory.findOne({
         where: { subCategoryId: subCategoryId },
         include: {
             model: Category,
-            attributes: ["categoryName", "categorySlug"] 
+            attributes: ["categoryName", "categorySlug"]
         }
     });
 
@@ -106,8 +116,8 @@ exports.getSubCategoryById = asyncHandler(async (req, res) => {
         subCategorySlug: subCategory.subCategorySlug,
         subCategoryImage: subCategory.subCategoryImage,
         categoryId: subCategory.categoryId,
-        categoryName: subCategory.Category.categoryName, 
-        categorySlug: subCategory.Category.categorySlug, 
+        categoryName: subCategory.Category.categoryName,
+        categorySlug: subCategory.Category.categorySlug,
         createdAt: subCategory.createdAt,
         updatedAt: subCategory.updatedAt
     };
@@ -115,14 +125,8 @@ exports.getSubCategoryById = asyncHandler(async (req, res) => {
     res.status(200).json(formattedData);
 });
 
-
-
-
-
 exports.updateSubCategoryById = asyncHandler(async (req, res) => {
     const userId = req.user.id;
-    console.log(userId);
-
     const userRoles = await UserRole.findAll({
         where: { userId },
         include: {
@@ -132,32 +136,42 @@ exports.updateSubCategoryById = asyncHandler(async (req, res) => {
     });
 
     const isAdmin = userRoles.length > 0;
-    console.log(isAdmin);
 
     if (!isAdmin) {
-        return res.status(403).json({ message: "You are not authorized to update Category. Only admins are allowed." });
+        return res.status(403).json({ message: "You are not authorized to update SubCategory. Only admins are allowed." });
     }
 
     const { subCategoryId } = req.params;
-    const { subCategoryName, subCategoryImage, categoryId } = req.body;
+    const { subCategoryName, categoryId } = req.body;
 
     const subCategory = await SubCategory.findByPk(subCategoryId);
     if (!subCategory) {
         return res.status(404).json({ message: "SubCategory not found" });
     }
 
-    await subCategory.update({
-        subCategoryName: subCategoryName || subCategory.subCategoryName,
-        subCategorySlug: subCategoryName ? slugify(subCategoryName, { lower: true }) : subCategory.subCategorySlug,
-        subCategoryImage: subCategoryImage || subCategory.subCategoryImage,
-        categoryId: categoryId || subCategory.categoryId
-    });
+    try {
+        let updateData = {
+            subCategoryName: subCategoryName || subCategory.subCategoryName,
+            subCategorySlug: subCategoryName ? slugify(subCategoryName, { lower: true }) : subCategory.subCategorySlug,
+            categoryId: categoryId || subCategory.categoryId
+        };
 
-    res.status(200).json({ message: "SubCategory updated successfully", subCategory });
+        // If there's a new image, upload it to Cloudinary
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'subcategories'
+            });
+            updateData.subCategoryImage = result.secure_url;
+        }
+
+        await subCategory.update(updateData);
+
+        res.status(200).json({ message: "SubCategory updated successfully", subCategory });
+    } catch (error) {
+        console.error('Error updating subcategory:', error);
+        return res.status(500).json({ message: "Error updating subcategory" });
+    }
 });
-
-
-
 
 exports.deleteSubCategoryById = asyncHandler(async (req, res) => {
     const userId = req.user.id;

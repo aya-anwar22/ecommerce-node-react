@@ -27,7 +27,7 @@ app.use('/api/v1/users', authRoutes);
 app.use('/api/v1/category', categoryRoutes);
 app.use('/api/v1/subcatergory', subCategoryRouters)
 app.use('/api/v1/brand', brandRouters);
-app.use('/api/v1/product', productRouters)
+// app.use('/api/v1/product', productRouters)
 app.use('/api/v1/users', userRoutes)
 
 

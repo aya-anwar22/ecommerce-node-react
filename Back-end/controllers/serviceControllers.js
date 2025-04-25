@@ -1,4 +1,4 @@
-const { Product } = require("../models/sql");
+const  { Service, ServiceSubCategory} = require("../models/sql");
 const asyncHandler = require("express-async-handler");
 const {User, UserVerification, Role, UserRole, Category, SubCategory, Brand} = require("../models/sql");
 const slugify = require("slugify");
@@ -17,16 +17,16 @@ const isAdminUser = async (userId) => {
     return userRoles.length > 0;
 };
 
-
-exports.addProuct = asyncHandler(async(req, res) => {
+exports.createService = asyncHandler(async(req, res) => {
     const userId = req.user.id;
     const isAdmin = isAdminUser(userId);
 
     if(!isAdmin){
-        return res.status(403).json({ message: "You are not authorized to create Product. Only admins are allowed." });
+        return res.status(403).json({ message: "You are not authorized to create Service. Only admins are allowed." });
     }
-    const { productName, description, brandId, imageCover, price, discountPrice, stock, colors, images } = req.body;
-    // const productslug = 
 
-
+    const { serviceName, description, price, estimatedDuration, categoryId, subCategoryIds } = req.body;
+    if(!serviceName ||  !description ||  !price ||  !estimatedDuration ||  !categoryId ||  !subCategoryIds){
+        return res.status().json({})
+    }
 })

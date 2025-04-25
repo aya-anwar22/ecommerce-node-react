@@ -30,7 +30,6 @@ async function generateTokens(user, regenerateRefreshToken = false) {
 };
 
 
-
 const sendVerificationEmail = async (user, nurseryName) => {
     const mailOptions = {
         from: process.env.ADMIN_EMAIL,
@@ -41,8 +40,6 @@ const sendVerificationEmail = async (user, nurseryName) => {
     };
     await transporter.sendMail(mailOptions);
 };
-
-
 
 
 exports.register = asyncHandler(async (req, res) => {
@@ -129,9 +126,6 @@ exports.register = asyncHandler(async (req, res) => {
         }
     }
 });
-
-
-
 
 exports.verifyEmail = asyncHandler(async (req, res) => {
     const { email, emailVerificationCode } = req.body;
