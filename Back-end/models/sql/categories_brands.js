@@ -6,7 +6,19 @@ const Category = sequelize.define("Category", {
     categoryId: {type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true},
     categoryName: {type: DataTypes.STRING(100), allowNull: false},
     categorySlug: {type: DataTypes.STRING(100)},
-    categoryImage: {type: DataTypes.TEXT}
+    categoryImage: {type: DataTypes.TEXT},
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    deletedBy: {
+        type: DataTypes.INTEGER, 
+        allowNull: true
+    }
 }  ,{ timestamps: true });
 
 
@@ -21,7 +33,19 @@ const SubCategory = sequelize.define("subCategory", {
     },
     subCategoryName: {type: DataTypes.STRING(100), allowNull: false},
     subCategorySlug: {type: DataTypes.STRING(100)},
-    subCategoryImage: {type: DataTypes.TEXT}
+    subCategoryImage: {type: DataTypes.TEXT},
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    deletedBy: {
+        type: DataTypes.INTEGER, 
+        allowNull: true
+    }
 }  ,{ timestamps: true });
 
 
@@ -30,7 +54,19 @@ const Brand = sequelize.define("Brand", {
     brandId: {type: DataTypes.STRING, autoIncrement: true, primaryKey: true},
     brandName: {type: DataTypes.STRING(100), allowNull: false},
     brandSlug: {type: DataTypes.STRING(100)},
-    brandImage: {type: DataTypes.TEXT}
+    brandImage: {type: DataTypes.TEXT},
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    deletedBy: {
+        type: DataTypes.INTEGER, 
+        allowNull: true
+    }
 }  ,{ timestamps: true });
 
 
