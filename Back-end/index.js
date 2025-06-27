@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require("morgan");
 const cors = require('cors');
-dotenv.config({ path: 'config.env' });
+require("dotenv").config({ path: './.env' });
 const sequelize = require('./config/database'); // Database connection setup
 const ApiError = require('./utils/appError');
 const globalError = require('./middleware/errorMiddleWare');
