@@ -21,6 +21,9 @@ app.use(morgan('dev')); // HTTP request logging
 // Body Parsing Middleware
 app.use(express.json()); // For JSON bodies
 app.use(express.urlencoded({ extended: true })); // For URL encoded bodies
+app.get('/', (req, res) => {
+  res.send('Welcome to the E-commerce API!');
+});
 
 // Routes
 app.use('/api/v1/users', authRoutes);
